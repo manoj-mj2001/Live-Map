@@ -1,23 +1,18 @@
 {
   "name": "google-map",
   "version": "1.0.0",
-  "description": "",
   "type": "commonjs",
-  "main": "index.js",
-  "engines": {
-    "node": "18.x"
-  },
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
   "license": "ISC",
   "dependencies": {
-    "cors": "^2.8.5",
-    "ejs": "^3.1.10",
     "express": "^4.19.2",
+    "netlify-cli": "^17.33.3",
+    "netlify-lambda": "^2.0.16",
     "nodemon": "^3.1.4",
-    "socket.io": "^4.7.5",
-    "socket.io-client": "^4.7.5"
+    "serverless-http": "^3.2.0",
+    "socket.io": "^4.7.5"
   }
 }
