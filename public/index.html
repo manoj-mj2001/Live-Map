@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+      }
+      #map {
+        max-width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/esri-leaflet"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+      const socket = io();
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            socket.emit("send-location", { latitude, longitude });
+          },
+          (error) => {
+            console.error(error);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 1000,
+            maximumAge: 0,
+          }
+        );
+      }
+
+      const map = L.map("map").setView([0, 0], 13);
+
+      L.esri
+        .basemapLayer("Imagery", {
+          detectRetina: true,
+          zIndex: 1,
+          maxZoom: 19,
+          minZoom: 1,
+        })
+        .addTo(map);
+
+      L.esri
+        .basemapLayer("ImageryLabels", {
+          detectRetina: true,
+          zIndex: 1,
+          maxZoom: 19,
+          minZoom: 1,
+        })
+        .addTo(map);
+
+      const markers = {};
+
+      socket.on("receive-location", (data) => {
+        const { id, latitude, longitude } = data;
+        map.setView([latitude, longitude]);
+        if (markers[id]) {
+          markers[id].setLatLng([latitude, longitude]);
+        } else {
+          markers[id] = L.marker([latitude, longitude]).addTo(map);
+        }
+      });
+
+      socket.on("user-disconnected", (id) => {
+        if (markers[id]) {
+          map.removeLayer(markers[id]);
+          delete markers[id];
+        }
+      });
+    </script>
+  </body>
+</html>
