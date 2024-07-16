@@ -88,6 +88,13 @@
           delete markers[id];
         }
       });
+
+      const backendUrl = "https://livemap-server.vercel.app/";
+
+      fetch(`${backendUrl}/data`)
+        .then((response) => response.json())
+        .then((data) => console.log(data))
+        .catch((error) => console.error("Error:", error));
     </script>
   </body>
 </html>
